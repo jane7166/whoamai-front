@@ -18,23 +18,41 @@ const LoginButton = ({ loginStatus, setLoginStatus }: LoginButtonProps) => {
   }, [loginStatus]);
 
   const checkLoginState = () => {
-    if (window.FB) {
-      window.FB.getLoginStatus((response: FBLoginStatusResponse) => {
-        console.log("Login status checked:", response);
-        setIsLoggedIn(response.status === "connected");
-        setLoginStatus(response.status);
-        if (response.status === "connected") {
-          router.push("/report");
-        }
-      });
+    if (!window.FB) {
+      console.error("🚨 Facebook SDK가 아직 로드되지 않았습니다.");
+      return;
     }
+  
+    window.FB.getLoginStatus((response: FBLoginStatusResponse) => {
+      console.log("🔍 Facebook 로그인 상태 확인:", response);
+  
+      if (!response || !response.status) {
+        console.error("❌ Facebook 로그인 상태 응답이 올바르지 않습니다.");
+        return;
+      }
+  
+      setLoginStatus(response.status);
+      setIsLoggedIn(response.status === "connected");
+  
+      if (response.status === "connected") {
+        console.log("✅ 로그인 성공! /report로 이동");
+        router.push("/report");
+      } else {
+        console.log("❌ 로그인하지 않음");
+      }
+    });
   };
-
+  
   const handleLogin = () => {
-    if (window.FB) {
-      window.FB.login(checkLoginState, { scope: "public_profile,email" });
+    if (!window.FB) {
+      console.error("🚨 Facebook SDK가 아직 로드되지 않았습니다. 잠시 후 다시 시도하세요.");
+      return;
     }
+  
+    console.log("🔑 Facebook 로그인 시도...");
+    window.FB.login(checkLoginState, { scope: "public_profile,email" });
   };
+  
 
   return (
     <LoginBaseButton onClick={handleLogin}>

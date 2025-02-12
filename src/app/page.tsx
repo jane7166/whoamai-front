@@ -20,13 +20,19 @@ export default function Home() {
   const [loginStatus, setLoginStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isSDKLoaded && window.FB) {
+    if (!isSDKLoaded) return; // SDK가 아직 안 로드되었으면 실행 X
+  
+    if (window.FB) {
+      console.log("🔄 Facebook 로그인 상태 확인 중...");
       window.FB.getLoginStatus((response: FBLoginStatusResponse) => {
-        console.log("Facebook Login Status:", response);
+        console.log("✅ Facebook 로그인 상태:", response);
         setLoginStatus(response.status);
       });
+    } else {
+      console.error("❌ Facebook SDK 로드 오류! `window.FB`가 없습니다.");
     }
   }, [isSDKLoaded]);
+  
 
   return (
     <Container>
