@@ -1,33 +1,37 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { styled } from "styled-components";
+import { useRouter } from "next/navigation";
+import styled from "styled-components";
 
-const LoginButton = () => {
+interface LoginButtonProps {
+  loginStatus: string | null;
+  setLoginStatus: (status: string) => void;
+}
+
+const LoginButton = ({ loginStatus, setLoginStatus }: LoginButtonProps) => {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.FB) {
-      window.FB.getLoginStatus((response) => {
-        console.log("Facebook Login Status:", response);
-        if (response.status === "connected") {
-          setIsLoggedIn(true);
-        }
-      });
+    if (loginStatus === "connected") {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
     }
-  }, []);
+  }, [loginStatus]);
 
   const checkLoginState = () => {
     if (window.FB) {
-      window.FB.getLoginStatus((response) => {
+      window.FB.getLoginStatus((response: any) => {
         console.log("Login status checked:", response);
         if (response.status === "connected") {
           setIsLoggedIn(true);
+          setLoginStatus(response.status);
           router.push("/report"); // ✅ 로그인 성공 시 자동 이동
         } else {
           setIsLoggedIn(false);
+          setLoginStatus(response.status);
         }
       });
     }
@@ -48,12 +52,13 @@ const LoginButton = () => {
 
 export default LoginButton;
 
+// 스타일 설정
 const LoginBaseButton = styled.button`
   width: 200px;
   height: 55px;
   margin-top: 100px;
   margin-bottom: 50px;
-  color: #FFF;
+  color: #fff;
   text-align: center;
   font-family: "AR One Sans";
   font-size: 32px;

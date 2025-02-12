@@ -10,8 +10,8 @@ export default function Home() {
   const [loginStatus, setLoginStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.FB) {
-      window.FB.getLoginStatus((response) => {
+    if (isSDKLoaded && window.FB) {
+      window.FB.getLoginStatus((response: any) => {
         console.log("Facebook Login Status:", response);
         setLoginStatus(response.status);
       });
@@ -31,7 +31,7 @@ export default function Home() {
         </Description>
       </DescriptionWrapper>
 
-      <LoginButton />
+        <LoginButton loginStatus={loginStatus} setLoginStatus={setLoginStatus} />
     </Container>
   );
 }
