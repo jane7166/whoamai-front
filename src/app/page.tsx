@@ -5,13 +5,23 @@ import useFacebookSDK from "./hooks/useFacebookSDK";
 import styled from "styled-components";
 import LoginButton from "../components/LoginButton";
 
+interface FBLoginStatusResponse {
+  status: "connected" | "not_authorized" | "unknown";
+  authResponse?: {
+    accessToken: string;
+    expiresIn: number;
+    signedRequest: string;
+    userID: string;
+  };
+}
+
 export default function Home() {
   const isSDKLoaded = useFacebookSDK();
   const [loginStatus, setLoginStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (isSDKLoaded && window.FB) {
-      window.FB.getLoginStatus((response: any) => {
+      window.FB.getLoginStatus((response: FBLoginStatusResponse) => {
         console.log("Facebook Login Status:", response);
         setLoginStatus(response.status);
       });
@@ -31,7 +41,7 @@ export default function Home() {
         </Description>
       </DescriptionWrapper>
 
-        <LoginButton loginStatus={loginStatus} setLoginStatus={setLoginStatus} />
+      <LoginButton loginStatus={loginStatus} setLoginStatus={setLoginStatus} />
     </Container>
   );
 }

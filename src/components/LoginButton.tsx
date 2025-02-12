@@ -14,24 +14,17 @@ const LoginButton = ({ loginStatus, setLoginStatus }: LoginButtonProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (loginStatus === "connected") {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
+    setIsLoggedIn(loginStatus === "connected");
   }, [loginStatus]);
 
   const checkLoginState = () => {
     if (window.FB) {
-      window.FB.getLoginStatus((response: any) => {
+      window.FB.getLoginStatus((response: FBLoginStatusResponse) => {
         console.log("Login status checked:", response);
+        setIsLoggedIn(response.status === "connected");
+        setLoginStatus(response.status);
         if (response.status === "connected") {
-          setIsLoggedIn(true);
-          setLoginStatus(response.status);
-          router.push("/report"); // ✅ 로그인 성공 시 자동 이동
-        } else {
-          setIsLoggedIn(false);
-          setLoginStatus(response.status);
+          router.push("/report");
         }
       });
     }
@@ -52,7 +45,6 @@ const LoginButton = ({ loginStatus, setLoginStatus }: LoginButtonProps) => {
 
 export default LoginButton;
 
-// 스타일 설정
 const LoginBaseButton = styled.button`
   width: 200px;
   height: 55px;
