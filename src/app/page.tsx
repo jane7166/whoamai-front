@@ -33,7 +33,6 @@ export default function Home() {
 
       <LoginButton />
 
-      {!isSDKLoaded ? <p>Facebook SDK 로딩 중...</p> : null}
       {loginStatus && <p>현재 로그인 상태: {loginStatus}</p>}
     </Container>
   );
