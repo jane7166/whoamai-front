@@ -3,8 +3,14 @@ import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 
 const WhoAmAIReport: React.FC = () => {
+  const [isClient, setIsClient] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const [fullName, setFullName] = useState<string | null>(null);
+
+  // 클라이언트에서만 렌더링
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // API에서 데이터를 가져오는 함수
   useEffect(() => {
@@ -22,6 +28,8 @@ const WhoAmAIReport: React.FC = () => {
     }
     fetchData();
   }, []);
+
+  if (!isClient) return null; // 서버에서는 렌더링 X, 클라이언트에서만 렌더링
 
   return (
     <MainContainer>
@@ -67,7 +75,7 @@ const Header = styled.header`
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  padding: 15px 25px; /* 여백 추가 */
+  padding: 15px 25px;
 `;
 
 const HeaderText = styled.div`
@@ -81,11 +89,11 @@ const Summary = styled.div`
   justify-content: center;
   width: 100%;
   max-width: 1200px;
-  margin-top: 30px; /* 여백 추가 */
+  margin-top: 30px;
   background: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
-  padding: 25px; /* 여백 추가 */
+  padding: 25px;
   flex-wrap: wrap;
   position: relative;
 `;
