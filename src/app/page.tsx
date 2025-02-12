@@ -6,19 +6,17 @@ import styled from "styled-components";
 import LoginButton from "../components/LoginButton";
 
 export default function Home() {
-  useFacebookSDK();
-  const [isSDKLoaded, setIsSDKLoaded] = useState(false);
+  const isSDKLoaded = useFacebookSDK();
   const [loginStatus, setLoginStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.FB) {
-      setIsSDKLoaded(true);
-      window.FB.getLoginStatus((response: any) => {
+      window.FB.getLoginStatus((response) => {
         console.log("Facebook Login Status:", response);
         setLoginStatus(response.status);
       });
     }
-  }, []);
+  }, [isSDKLoaded]);
 
   return (
     <Container>
@@ -32,14 +30,10 @@ export default function Home() {
           노출된 개인정보가 있는지 직접 찾아드릴게요! 🕵🏻
         </Description>
       </DescriptionWrapper>
-      
-      {/* 기존 로그인 버튼 유지 */}
+
       <LoginButton />
 
-      {/* Facebook SDK가 로드되었는지 상태 표시 추가 */}
       {!isSDKLoaded ? <p>Facebook SDK 로딩 중...</p> : null}
-      
-      {/* Facebook 로그인 상태 표시 추가 */}
       {loginStatus && <p>현재 로그인 상태: {loginStatus}</p>}
     </Container>
   );
