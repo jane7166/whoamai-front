@@ -47,7 +47,7 @@ export default function Home() {
         </Description>
       </DescriptionWrapper>
 
-      <LoginButton loginStatus={loginStatus} setLoginStatus={setLoginStatus} />
+      <LoginButton/>
     </Container>
   );
 }
