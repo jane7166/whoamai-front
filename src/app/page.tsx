@@ -32,8 +32,6 @@ export default function Home() {
       </DescriptionWrapper>
 
       <LoginButton />
-
-      {loginStatus && <p>현재 로그인 상태: {loginStatus}</p>}
     </Container>
   );
 }
