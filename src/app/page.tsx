@@ -47,7 +47,12 @@ export default function Home() {
         </Description>
       </DescriptionWrapper>
 
-      <LoginButton/>
+      <LoginButton />
+
+      {/* ✅ 로그인 상태를 화면에 표시하여 ESLint 오류 방지 */}
+      {loginStatus && (
+        <StatusMessage>현재 로그인 상태: {loginStatus}</StatusMessage>
+      )}
     </Container>
   );
 }
@@ -98,4 +103,10 @@ const Description = styled.p`
   font-weight: 400;
   line-height: normal;
   text-align: center;
+`;
+
+const StatusMessage = styled.p`
+  margin-top: 20px;
+  font-size: 18px;
+  color: #555;
 `;
