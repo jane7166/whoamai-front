@@ -6,17 +6,19 @@ const WhoAmAIReport: React.FC = () => {
   const [isClient, setIsClient] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const [fullName, setFullName] = useState<string | null>(null);
+  const [aiResponse, setAiResponse] = useState<string>(""); // AI 응답 저장
+  const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 추가
 
   // 클라이언트에서만 렌더링
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // API에서 데이터를 가져오는 함수
+  // 사용자 정보 API 호출
   useEffect(() => {
-    async function fetchData() {
+    async function fetchUserData() {
       try {
-        const response = await fetch("/api/user"); // 여기에 API URL을 입력하세요
+        const response = await fetch("/api/user");
         const data = await response.json();
         setUsername(data.username || "@unknown_user");
         setFullName(data.fullName || "이름");
@@ -26,7 +28,27 @@ const WhoAmAIReport: React.FC = () => {
         setFullName("이름");
       }
     }
-    fetchData();
+    fetchUserData();
+  }, []);
+
+  // AI 응답 가져오기
+  useEffect(() => {
+    async function fetchAIResponse() {
+      try {
+        const response = await fetch("http://localhost:5000/generate"); // Flask 백엔드 호출
+        const data = await response.json();
+        if (data.response) {
+          setAiResponse(data.response);
+        } else {
+          setAiResponse("응답을 가져오는 데 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("Error fetching AI response:", error);
+        setAiResponse("오류가 발생했습니다.");
+      }
+      setLoading(false);
+    }
+    fetchAIResponse();
   }, []);
 
   if (!isClient) return null; // 서버에서는 렌더링 X, 클라이언트에서만 렌더링
@@ -51,6 +73,11 @@ const WhoAmAIReport: React.FC = () => {
         <Section2>
           <CenteredContent>
             <DescriptionTitle>{username} 님은 이런 사람일까요?</DescriptionTitle>
+            {loading ? (
+              <LoadingText>🚀 AI 응답 생성 중...</LoadingText>
+            ) : (
+              <AIResponseText>{aiResponse}</AIResponseText>
+            )}
           </CenteredContent>
         </Section2>
       </Content>
@@ -166,4 +193,18 @@ const FullName = styled.div`
 const DescriptionTitle = styled.div`
   font-size: 1rem;
   color: #555;
+  margin-bottom: 10px;
+`;
+
+const AIResponseText = styled.p`
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-top: 10px;
+`;
+
+const LoadingText = styled.p`
+  font-size: 1rem;
+  color: #888;
+  font-style: italic;
 `;
