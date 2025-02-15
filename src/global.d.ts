@@ -1,30 +1,17 @@
-export {};
+import NextAuth from "next-auth";
 
-declare global {
-  interface FBLoginStatusResponse {
-    status: "connected" | "not_authorized" | "unknown";
-    authResponse?: {
-      accessToken: string;
-      expiresIn: number;
-      signedRequest: string;
-      userID: string;
+declare module "next-auth" {
+  interface Session {
+    accessToken?: string;
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
     };
   }
 
-  interface Window {
-    FB?: {
-      init: (params: {
-        appId: string;
-        cookie: boolean;
-        xfbml: boolean;
-        version: string;
-      }) => void;
-      AppEvents: {
-        logPageView: () => void;
-      };
-      getLoginStatus: (callback: (response: FBLoginStatusResponse) => void) => void;
-      login: (callback: (response: FBLoginStatusResponse) => void, options?: { scope: string }) => void; // ✅ 추가됨!
-    };
-    fbAsyncInit?: () => void;
+  interface JWT {
+    accessToken?: string;
   }
 }

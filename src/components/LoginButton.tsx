@@ -1,47 +1,39 @@
-// import { useEffect } from "react";
+"use client";
 
-import { useRouter } from "next/navigation";
-import { styled } from "styled-components";
+import { signIn } from "next-auth/react";
+import styled from "styled-components";
 
-const LoginButton = () => {
-  const router = useRouter();
-//   useEffect(() => {
-//       router.push("/report");
-//   });
-
+export default function LoginButton() {
   return (
-    <LoginBaseButton onClick={() => router.push("/report")}>Login</LoginBaseButton>
+    <GoogleButton onClick={() => signIn("google")}>
+      <GoogleIcon src="/google-icon.svg" alt="Google Logo" />
+      Google 계정으로 로그인
+    </GoogleButton>
   );
-};
+}
 
-export default LoginButton;
+const GoogleButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+  background-color: #fff;
+  border: 2px solid #4285F4;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 
-const LoginBaseButton = styled.button`
-    width: 200px;
-    height: 55px;
+  &:hover {
+    background-color: #f1f1f1;
+  }
+`;
 
-    margin-top: 100px;
-
-    margin-bottom: 50px;
-
-    color: #FFF;
-    text-align: center;
-    font-family: "AR One Sans";
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-
-    border-radius: 30px;
-    background: linear-gradient(90deg, #0180FF 0%, #014D99 100%);
-    color: white;
-
-    cursor: pointer;
-
-    &:hover {
-        background-color: #014D99;
-    }
-    &:active {
-        background-color: #014D99;
-    }
+const GoogleIcon = styled.img`
+  width: 24px;
+  height: 24px;
 `;

@@ -1,41 +1,27 @@
 "use client";
+
 import styled from "styled-components";
 import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react"; // ✅ 로그인된 사용자 정보 가져오기
+import { useRouter } from "next/navigation"; // ✅ Next.js 클라이언트 라우팅 추가
 
 const WhoAmAIReport: React.FC = () => {
-  const [isClient, setIsClient] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
-  const [fullName, setFullName] = useState<string | null>(null);
-  const [aiResponse, setAiResponse] = useState<string>(""); // AI 응답 저장
-  const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 추가
+  const { data: session } = useSession();
+  const router = useRouter();
 
-  // 클라이언트에서만 렌더링
+  const [isClient, setIsClient] = useState(false);
+  const [aiResponse, setAiResponse] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+
   useEffect(() => {
     setIsClient(true);
-  }, []);
-
-  // 사용자 정보 API 호출
-  useEffect(() => {
-    async function fetchUserData() {
-      try {
-        const response = await fetch("/api/user");
-        const data = await response.json();
-        setUsername(data.username || "@unknown_user");
-        setFullName(data.fullName || "이름");
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setUsername("@unknown_user");
-        setFullName("이름");
-      }
-    }
-    fetchUserData();
   }, []);
 
   // AI 응답 가져오기
   useEffect(() => {
     async function fetchAIResponse() {
       try {
-        const response = await fetch("http://localhost:5000/generate"); // Flask 백엔드 호출
+        const response = await fetch("http://localhost:5000/generate");
         const data = await response.json();
         if (data.response) {
           setAiResponse(data.response);
@@ -51,20 +37,20 @@ const WhoAmAIReport: React.FC = () => {
     fetchAIResponse();
   }, []);
 
-  if (!isClient) return null; // 서버에서는 렌더링 X, 클라이언트에서만 렌더링
+  if (!isClient) return null; 
 
   return (
     <MainContainer>
       <Header>
-        <HeaderText>Who @m AI</HeaderText>
+        <HeaderText onClick={() => router.push("/")}>Who @m AI</HeaderText> {/* ✅ 클릭 시 메인으로 이동 */}
+        <BackButton onClick={() => router.push("/")}>홈으로 돌아가기</BackButton>
       </Header>
       <Summary>
         <Section1>
           <ProfileContainer>
-            <ProfileImage src="/base-image.svg" alt="Profile" />
+            <ProfileImage src={session?.user?.image || "/base-image.svg"} alt="Profile" />
             <ProfileDetails>
-              <Username>{username}</Username>
-              <FullName>{fullName}</FullName>
+              <Username>{session?.user?.name || "@unknown_user"}</Username>
             </ProfileDetails>
           </ProfileContainer>
         </Section1>
@@ -72,7 +58,7 @@ const WhoAmAIReport: React.FC = () => {
       <Content>
         <Section2>
           <CenteredContent>
-            <DescriptionTitle>{username} 님은 이런 사람일까요?</DescriptionTitle>
+            <DescriptionTitle>{session?.user?.name} 님은 이런 사람일까요?</DescriptionTitle>
             {loading ? (
               <LoadingText>🚀 AI 응답 생성 중...</LoadingText>
             ) : (
@@ -101,14 +87,41 @@ const MainContainer = styled.main`
 const Header = styled.header`
   width: 100%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   padding: 15px 25px;
 `;
 
-const HeaderText = styled.div`
+/* ✅ 클릭 가능하도록 cursor: pointer 추가 */
+const HeaderText = styled.button`
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #007bff;
+  }
+`;
+
+/* ✅ 홈으로 이동 버튼 스타일 */
+const BackButton = styled.button`
+  background-color: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const Summary = styled.div`
@@ -139,6 +152,7 @@ const ProfileContainer = styled.div`
   align-items: center;
 `;
 
+/* ✅ 로그인된 사용자의 프로필 사진을 반영 */
 const ProfileImage = styled.img`
   width: 100px;
   height: 100px;
@@ -177,16 +191,11 @@ const ProfileDetails = styled.div`
   text-align: center;
 `;
 
+/* ✅ 로그인된 사용자의 닉네임을 표시 */
 const Username = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  text-align: center;
-`;
-
-const FullName = styled.div`
-  font-size: 1rem;
-  color: #777;
   text-align: center;
 `;
 
