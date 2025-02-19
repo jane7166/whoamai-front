@@ -56,6 +56,7 @@ const Container = styled.div`
 `;
 
 const LogoWrapper = styled.div`
+  width: 80%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,7 +68,7 @@ const Logo = styled.h1`
   justify-content: space-between;
   color: #000;
   font-family: "Abhaya Libre ExtraBold";
-  font-size: 200px;
+  font-size: 100px;
   font-style: normal;
   font-weight: 800;
 `;
@@ -99,7 +100,7 @@ const Description = styled.p`
 `;
 
 const ButtonWrapper = styled.div`
-  margin-top: 40px;
+  margin-top: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
