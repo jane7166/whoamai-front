@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import LoginButton from "@/components/LoginButton";
-
+import Image from "next/image";
 export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -15,19 +15,24 @@ export default function Home() {
 
   return (
     <Container>
-      <LogoWrapper>
-        <Logo>Who @m AI</Logo>
-      </LogoWrapper>
-      <DescriptionWrapper>
-        <Description>
-          Google 계정으로 로그인 해주세요.<br />
-          Blogger 분석을 통해<br />
-          노출된 개인정보를 찾아드릴게요! <span>🕵🏻</span>
-        </Description>
-      </DescriptionWrapper>
       <ButtonWrapper>
         {session ? (
           <>
+            <LogoWrapper>
+            <Image
+              src="/whoamai-main-logo.svg"
+              width={450}
+              height={500}
+              padding-right={20}
+              alt="location"
+            />
+            </LogoWrapper>
+            <DescriptionWrapper>
+              <Description>
+                Blogger 분석을 통해 노출된 개인정보를 찾아드릴게요! <span>🕵🏻</span> <br />
+                Google 계정으로 로그인 해주세요.
+              </Description>
+            </DescriptionWrapper>
             <UserInfo>
               <ProfileImage src={session.user?.image || "/default-profile.png"} alt="User Image" />
               <UserName>{session.user?.name}</UserName>
@@ -36,7 +41,24 @@ export default function Home() {
             <ReportButton onClick={handleLoadingRedirect}>Blogger 게시글 불러오기</ReportButton>
           </>
         ) : (
+          <>
+          <LogoWrapper>
+          <Image
+            src="/whoamai-main-logo.svg"
+            width={450}
+            height={500}
+            padding-right={20}
+            alt="location"
+          />
+          </LogoWrapper>
+          <DescriptionWrapper>
+            <Description>
+              Blogger 분석을 통해 노출된 개인정보를 찾아드릴게요! <span>🕵🏻</span> <br />
+              Google 계정으로 로그인 해주세요.
+            </Description>
+          </DescriptionWrapper>
           <LoginButton />
+          </>
         )}
       </ButtonWrapper>
     </Container>
@@ -45,11 +67,12 @@ export default function Home() {
 
 // ✅ Styled Components (기존 코드 + 내가 추가한 코드 통합)
 const Container = styled.div`
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #ffffff;
+  background: url('/whoamai-bgimg.png') no-repeat center center fixed;
+  background-size: cover;
   width: 100%;
   height: 100vh;
   padding: 0;
@@ -62,22 +85,20 @@ const LogoWrapper = styled.div`
   justify-content: center;
 `;
 
-const Logo = styled.h1`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: #000;
-  font-family: "Abhaya Libre ExtraBold";
-  font-size: 100px;
-  font-style: normal;
-  font-weight: 800;
-`;
+// const Logo = styled.img`
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   color: #000;
+//   width: 400px;
+//   height: 461px;
+// `;
 
 const DescriptionWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 10px;
   text-align: center;
   max-width: 600px;
 `;
@@ -85,7 +106,7 @@ const DescriptionWrapper = styled.div`
 const Description = styled.p`
   color: #000;
   font-family: "AR One Sans";
-  font-size: 32px;
+  font-size: 25px;
   font-style: normal;
   font-weight: 400;
   line-height: 1.6;
@@ -100,7 +121,7 @@ const Description = styled.p`
 `;
 
 const ButtonWrapper = styled.div`
-  margin-top: 60px;
+  margin-top: 0px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -113,7 +134,7 @@ const UserInfo = styled.div`
   align-items: center;
   gap: 20px;
   background-color: #f1f1f1;
-  padding: 20px 30px;
+  padding: 10px 20px;
   border-radius: 12px;
   box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
   font-size: 22px;
@@ -158,7 +179,7 @@ const ReportButton = styled.button`
   border-radius: 8px;
   cursor: pointer;
   transition: 0.3s;
-  margin-top: 50px;
+  margin-top: 20px;
 
   &:hover {
     background-color: #0056b3;

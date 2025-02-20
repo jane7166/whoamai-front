@@ -95,7 +95,8 @@ const PageContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f9f9f9;
+  background: url('/whoamai-bgimg.png') no-repeat center center fixed;
+  background-size: cover;
 `;
 
 const Container = styled.div`

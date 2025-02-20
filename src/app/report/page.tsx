@@ -4,6 +4,7 @@ import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react"; // ✅ 로그인된 사용자 정보 가져오기
 import { useRouter } from "next/navigation"; // ✅ Next.js 클라이언트 라우팅 추가
+import Image from "next/image"; // ✅ 이미지 컴포넌트 추가
 
 const WhoAmAIReport: React.FC = () => {
   const { data: session } = useSession();
@@ -42,7 +43,14 @@ const WhoAmAIReport: React.FC = () => {
   return (
     <MainContainer>
       <Header>
-        <HeaderText onClick={() => router.push("/")}>Who @m AI</HeaderText> {/* ✅ 클릭 시 메인으로 이동 */}
+        <Image
+          src="/report-logo.png"
+          width={150}
+          height={30}
+          padding-right={20}
+          alt="location"
+          onClick={() => router.push("/")}
+        />
         <BackButton onClick={() => router.push("/")}>홈으로 돌아가기</BackButton>
       </Header>
       <Summary>
@@ -79,7 +87,8 @@ const MainContainer = styled.main`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f5f5f5;
+  background: url('/whoamai-bgimg.png') no-repeat center center fixed;
+  background-size: cover;
   font-family: Arial, sans-serif;
   padding: 0 5%;
 `;
@@ -93,20 +102,20 @@ const Header = styled.header`
 `;
 
 /* ✅ 클릭 가능하도록 cursor: pointer 추가 */
-const HeaderText = styled.button`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  transition: color 0.2s;
+// const HeaderText = styled.button`
+//   font-size: 1.5rem;
+//   font-weight: bold;
+//   color: #333;
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+//   font-family: inherit;
+//   transition: color 0.2s;
 
-  &:hover {
-    color: #007bff;
-  }
-`;
+//   &:hover {
+//     color: #007bff;
+//   }
+// `;
 
 /* ✅ 홈으로 이동 버튼 스타일 */
 const BackButton = styled.button`
