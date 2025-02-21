@@ -72,16 +72,21 @@ export default function LoadingPage() {
                       <PostImage src={post.imageUrl} alt="Post Thumbnail" />
                     </PostImageWrapper>
                     <PostTitle>{post.title}</PostTitle>
-                    <PostDate>{new Date(post.published).toLocaleDateString()}</PostDate>
+                    <PostDate>
+                      {new Date(post.published).toLocaleDateString()}
+                    </PostDate>
                   </PostCard>
                 ))
               ) : (
                 <NoPostsText>😕 게시글이 없습니다.</NoPostsText>
               )}
             </PostContainer>
-            <ReportButton onClick={() => router.push("/report")}>
-              리포트 페이지로 이동하기
-            </ReportButton>
+            {/* 포스트가 하나 이상 있을 때만 리포트 페이지로 이동하는 버튼 표시 */}
+            {posts.length > 0 && (
+              <ReportButton onClick={() => router.push("/report")}>
+                리포트 페이지에서 결과 보기
+              </ReportButton>
+            )}
           </>
         )}
       </Container>
@@ -117,6 +122,7 @@ const Title = styled.h2`
   margin-bottom: 15px;
   text-align: center;
   width: 100%;
+  color: #333;
 `;
 
 const LoadingText = styled.p`
@@ -159,7 +165,6 @@ const PostCard = styled.div`
   border: 2px solid #ddd; /* ✅ 연한 회색 테두리 추가 */
 `;
 
-
 /* ✅ 4:3 비율의 이미지 박스 */
 const PostImageWrapper = styled.div`
   width: 100%;
@@ -193,19 +198,20 @@ const PostDate = styled.p`
   margin-top: 3px;
 `;
 
+// 리포트 페이지로 이동하는 버튼 (디자인은 녹색 계열로 변경)
 const ReportButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 12px 18px;
-  font-size: 16px;
+  background: #C7E6E5;
+  color: #000;
+  padding: 14px 24px;
+  font-size: 18px;
   font-weight: bold;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 20px;
-  transition: 0.3s;
+  margin-top: 30px;
+  transition: background 0.3s ease;
 
   &:hover {
-    background-color: #0056b3;
+    background:#A6C5C4;
   }
 `;
