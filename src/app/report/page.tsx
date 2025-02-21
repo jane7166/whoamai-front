@@ -11,27 +11,28 @@ const WhoAmAIReport: React.FC = () => {
   const router = useRouter();
 
   const [isClient, setIsClient] = useState(false);
-  const [aiResponse, setAiResponse] = useState<string>("");
+  const [aiResponses, setAiResponses] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // AI 응답 가져오기
+  // AI 응답 가져오기 (응답이 배열 형태로 반환된다고 가정)
   useEffect(() => {
     async function fetchAIResponse() {
       try {
         const response = await fetch("http://localhost:5000/generate");
         const data = await response.json();
         if (data.response) {
-          setAiResponse(data.response);
+          // data.response가 배열이면 그대로, 아니면 배열로 감싸서 처리
+          setAiResponses(Array.isArray(data.response) ? data.response : [data.response]);
         } else {
-          setAiResponse("응답을 가져오는 데 실패했습니다.");
+          setAiResponses(["응답을 가져오는 데 실패했습니다."]);
         }
       } catch (error) {
         console.error("Error fetching AI response:", error);
-        setAiResponse("오류가 발생했습니다.");
+        setAiResponses(["오류가 발생했습니다."]);
       }
       setLoading(false);
     }
@@ -47,34 +48,49 @@ const WhoAmAIReport: React.FC = () => {
           src="/report-logo.png"
           width={150}
           height={30}
-          padding-right={20}
           alt="location"
           onClick={() => router.push("/")}
         />
         <BackButton onClick={() => router.push("/")}>홈으로 돌아가기</BackButton>
       </Header>
-      <Summary>
-        <Section1>
-          <ProfileContainer>
-            <ProfileImage src={session?.user?.image || "/base-image.svg"} alt="Profile" />
-            <ProfileDetails>
-              <Username>{session?.user?.name || "@unknown_user"}</Username>
-            </ProfileDetails>
-          </ProfileContainer>
-        </Section1>
-      </Summary>
-      <Content>
-        <Section2>
-          <CenteredContent>
-            <DescriptionTitle>{session?.user?.name} 님은 이런 사람일까요?</DescriptionTitle>
+      <ReportPageWrapper>
+        <ImageWrapper>
+          <Image
+            src="/whoamai-robot.svg"
+            width={600}
+            height={600}
+            alt="location"
+          />
+        </ImageWrapper>
+        <SummaryWrapper>
+          <Summary>
+            <Section1>
+              <ProfileContainer>
+                <ProfileImage src={session?.user?.image || "/base-image.svg"} alt="Profile" />
+                <ProfileDetails>
+                  <Username>{session?.user?.name || "@unknown_user"}</Username>
+                </ProfileDetails>
+              </ProfileContainer>
+              <CenteredContent>
+                <DescriptionTitle>
+                  제가 예측할 수 있는 {session?.user?.name} 님의 정보는 아래와 같아요.
+                </DescriptionTitle>
+              </CenteredContent>
+            </Section1>
+          </Summary>
+          <Section2>
             {loading ? (
               <LoadingText>🚀 AI 응답 생성 중...</LoadingText>
             ) : (
-              <AIResponseText>{aiResponse}</AIResponseText>
+              aiResponses.map((response, index) => (
+                <Content key={index}>
+                  <AIResponseText>{response}</AIResponseText>
+                </Content>
+              ))
             )}
-          </CenteredContent>
-        </Section2>
-      </Content>
+          </Section2>
+        </SummaryWrapper>
+      </ReportPageWrapper>
     </MainContainer>
   );
 };
@@ -91,6 +107,7 @@ const MainContainer = styled.main`
   background-size: cover;
   font-family: Arial, sans-serif;
   padding: 0 5%;
+  overflow: hidden; /* 전체 페이지 스크롤 방지 */
 `;
 
 const Header = styled.header`
@@ -101,23 +118,6 @@ const Header = styled.header`
   padding: 15px 25px;
 `;
 
-/* ✅ 클릭 가능하도록 cursor: pointer 추가 */
-// const HeaderText = styled.button`
-//   font-size: 1.5rem;
-//   font-weight: bold;
-//   color: #333;
-//   background: none;
-//   border: none;
-//   cursor: pointer;
-//   font-family: inherit;
-//   transition: color 0.2s;
-
-//   &:hover {
-//     color: #007bff;
-//   }
-// `;
-
-/* ✅ 홈으로 이동 버튼 스타일 */
 const BackButton = styled.button`
   background-color: #007bff;
   color: white;
@@ -133,35 +133,76 @@ const BackButton = styled.button`
   }
 `;
 
-const Summary = styled.div`
+const ReportPageWrapper = styled.div`
   display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 1200px;
-  margin-top: 30px;
+  height: 80vh;
+  gap: 20px;
+`;
+
+const ImageWrapper = styled.div`
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const SummaryWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 20px;
+  margin-right: 20px;
+  margin-top: 50px;
+  `;
+
+const Summary = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
   background: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 25px;
-  flex-wrap: wrap;
-  position: relative;
 `;
 
 const Section1 = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 20px;
+`;
+
+// Section2가 직접 스크롤되도록 설정 (내부에 다수의 Content 컴포넌트가 생성됨)
+const Section2 = styled.div`
   width: 100%;
   flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 5px; /* 스크롤바 공간 고려 */
 `;
 
 const ProfileContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
 `;
 
-/* ✅ 로그인된 사용자의 프로필 사진을 반영 */
 const ProfileImage = styled.img`
   width: 100px;
   height: 100px;
@@ -171,27 +212,15 @@ const ProfileImage = styled.img`
 `;
 
 const Content = styled.div`
-  display: flex;
-  justify-content: center;
   width: 100%;
-  max-width: 1200px;
-  margin-top: 20px;
   background: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 20px;
-  flex-wrap: wrap;
-  position: relative;
-`;
-
-const Section2 = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const CenteredContent = styled.div`
+  width: 100%;
   text-align: center;
 `;
 
@@ -200,12 +229,10 @@ const ProfileDetails = styled.div`
   text-align: center;
 `;
 
-/* ✅ 로그인된 사용자의 닉네임을 표시 */
 const Username = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  text-align: center;
 `;
 
 const DescriptionTitle = styled.div`
