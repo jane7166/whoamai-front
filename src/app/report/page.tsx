@@ -30,7 +30,7 @@ const WhoAmAIReport: React.FC = () => {
         const bloggerData = await bloggerResponse.json();
 
         if (!bloggerData || bloggerData.error) {
-          setAiResponse("Blogger 데이터를 가져오는 데 실패했습니다.");
+          setAiResponses(["Blogger 데이터를 가져오는 데 실패했습니다."]);
           setLoading(false);
           return;
         }
@@ -45,7 +45,11 @@ const WhoAmAIReport: React.FC = () => {
         const flaskData = await flaskResponse.json();
 
         if (flaskData.response) {
-          setAiResponse(flaskData.response);
+          setAiResponses(
+            Array.isArray(flaskData.response)
+              ? flaskData.response
+              : [flaskData.response]
+          );
         } else {
           setAiResponses(["응답을 가져오는 데 실패했습니다."]);
         }
@@ -138,23 +142,6 @@ const Header = styled.header`
   padding: 15px 25px;
 `;
 
-/* ✅ 클릭 가능하도록 cursor: pointer 추가 */
-// const HeaderText = styled.button`
-//   font-size: 1.5rem;
-//   font-weight: bold;
-//   color: #333;
-//   background: none;
-//   border: none;
-//   cursor: pointer;
-//   font-family: inherit;
-//   transition: color 0.2s;
-
-//   &:hover {
-//     color: #007bff;
-//   }
-// `;
-
-/* ✅ 홈으로 이동 버튼 스타일 */
 const BackButton = styled.button`
   background-color: #007bff;
   color: white;
@@ -198,7 +185,7 @@ const SummaryWrapper = styled.div`
   gap: 20px;
   margin-right: 20px;
   margin-top: 50px;
-  `;
+`;
 
 const Summary = styled.div`
   width: 100%;
