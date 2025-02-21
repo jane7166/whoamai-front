@@ -79,11 +79,11 @@ const WhoAmAIReport: React.FC = () => {
       </Header>
       <ReportPageWrapper>
         <ImageWrapper>
-          <Image
+          <StyledRobotImage
             src="/whoamai-robot.svg"
+            alt="location"
             width={600}
             height={600}
-            alt="location"
           />
         </ImageWrapper>
         <SummaryWrapper>
@@ -173,6 +173,16 @@ const ImageWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  /* 브라우저 너비가 768px 이하이면 로봇 이미지 영역 축소 */
+  @media (max-width: 768px) {
+    width: 30%;
+  }
+`;
+
+// StyledRobotImage는 컨테이너 너비에 맞게 100%로 확장되도록 처리
+const StyledRobotImage = styled(Image)`
+  width: 100% !important;
+  height: auto !important;
 `;
 
 const SummaryWrapper = styled.div`
@@ -185,6 +195,10 @@ const SummaryWrapper = styled.div`
   gap: 20px;
   margin-right: 20px;
   margin-top: 50px;
+  /* 브라우저 너비가 768px 이하이면 Summary 영역 확대 */
+  @media (max-width: 768px) {
+    width: 70%;
+  }
 `;
 
 const Summary = styled.div`
