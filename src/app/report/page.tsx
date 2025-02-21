@@ -19,14 +19,33 @@ const WhoAmAIReport: React.FC = () => {
   }, []);
 
   // AI 응답 가져오기 (응답이 배열 형태로 반환된다고 가정)
+  // ✅ Blogger API → Flask로 전송 → Gemini API 응답 받기
   useEffect(() => {
     async function fetchAIResponse() {
       try {
-        const response = await fetch("http://localhost:5000/generate");
-        const data = await response.json();
-        if (data.response) {
-          // data.response가 배열이면 그대로, 아니면 배열로 감싸서 처리
-          setAiResponses(Array.isArray(data.response) ? data.response : [data.response]);
+        setLoading(true);
+
+        // ✅ Blogger API에서 데이터를 가져옴
+        const bloggerResponse = await fetch("/api/getBloggerData");
+        const bloggerData = await bloggerResponse.json();
+
+        if (!bloggerData || bloggerData.error) {
+          setAiResponse("Blogger 데이터를 가져오는 데 실패했습니다.");
+          setLoading(false);
+          return;
+        }
+
+        // ✅ Flask 백엔드로 JSON 전송
+        const flaskResponse = await fetch("http://localhost:5000/process_json", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bloggerData),
+        });
+
+        const flaskData = await flaskResponse.json();
+
+        if (flaskData.response) {
+          setAiResponse(flaskData.response);
         } else {
           setAiResponses(["응답을 가져오는 데 실패했습니다."]);
         }
@@ -36,10 +55,11 @@ const WhoAmAIReport: React.FC = () => {
       }
       setLoading(false);
     }
+
     fetchAIResponse();
   }, []);
 
-  if (!isClient) return null; 
+  if (!isClient) return null;
 
   return (
     <MainContainer>
@@ -118,6 +138,23 @@ const Header = styled.header`
   padding: 15px 25px;
 `;
 
+/* ✅ 클릭 가능하도록 cursor: pointer 추가 */
+// const HeaderText = styled.button`
+//   font-size: 1.5rem;
+//   font-weight: bold;
+//   color: #333;
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+//   font-family: inherit;
+//   transition: color 0.2s;
+
+//   &:hover {
+//     color: #007bff;
+//   }
+// `;
+
+/* ✅ 홈으로 이동 버튼 스타일 */
 const BackButton = styled.button`
   background-color: #007bff;
   color: white;
