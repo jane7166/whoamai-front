@@ -2,9 +2,9 @@
 
 import styled from "styled-components";
 import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react"; // ✅ 로그인된 사용자 정보 가져오기
-import { useRouter } from "next/navigation"; // ✅ Next.js 클라이언트 라우팅 추가
-import Image from "next/image"; // ✅ 이미지 컴포넌트 추가
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const WhoAmAIReport: React.FC = () => {
   const { data: session } = useSession();
@@ -18,33 +18,34 @@ const WhoAmAIReport: React.FC = () => {
     setIsClient(true);
   }, []);
 
-  // AI 응답 가져오기 (응답이 배열 형태로 반환된다고 가정)
-  // ✅ Blogger API → Flask로 전송 → Gemini API 응답 받기
   useEffect(() => {
     async function fetchAIResponse() {
       try {
         setLoading(true);
 
-        // ✅ Blogger API에서 데이터를 가져옴
+        // 1) Blogger API에서 데이터 가져오기
         const bloggerResponse = await fetch("/api/getBloggerData");
         const bloggerData = await bloggerResponse.json();
+        console.log("Blogger Data:", bloggerData);
 
-        if (!bloggerData || bloggerData.error) {
-          setAiResponses(["Blogger 데이터를 가져오는 데 실패했습니다."]);
+        // 2) items 필드가 존재하는지 확인
+        if (!bloggerData || !bloggerData.items) {
+          setAiResponses(["Blogger 데이터를 가져오는 데 실패했습니다. (items 누락)"]);
           setLoading(false);
           return;
         }
 
-        // ✅ Flask 백엔드로 JSON 전송
+        // 3) Flask 서버로 bloggerData 전체를 전송
         const flaskResponse = await fetch("http://localhost:5000/process_json", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(bloggerData),
         });
-
         const flaskData = await flaskResponse.json();
+        console.log("Flask Data:", flaskData);
 
         if (flaskData.response) {
+          // flaskData.response가 문자열 또는 배열인지 구분
           setAiResponses(
             Array.isArray(flaskData.response)
               ? flaskData.response
@@ -75,7 +76,9 @@ const WhoAmAIReport: React.FC = () => {
           alt="location"
           onClick={() => router.push("/")}
         />
-        <BackButton onClick={() => router.push("/")}>홈으로 돌아가기</BackButton>
+        <BackButton onClick={() => router.push("/")}>
+          홈으로 돌아가기
+        </BackButton>
       </Header>
       <ReportPageWrapper>
         <ImageWrapper>
@@ -90,9 +93,14 @@ const WhoAmAIReport: React.FC = () => {
           <Summary>
             <Section1>
               <ProfileContainer>
-                <ProfileImage src={session?.user?.image || "/base-image.svg"} alt="Profile" />
+                <ProfileImage
+                  src={session?.user?.image || "/base-image.svg"}
+                  alt="Profile"
+                />
                 <ProfileDetails>
-                  <Username>{session?.user?.name || "@unknown_user"}</Username>
+                  <Username>
+                    {session?.user?.name || "@unknown_user"}
+                  </Username>
                 </ProfileDetails>
               </ProfileContainer>
               <CenteredContent>
@@ -120,7 +128,6 @@ const WhoAmAIReport: React.FC = () => {
 };
 
 export default WhoAmAIReport;
-
 // Styled Components
 const MainContainer = styled.main`
   min-height: 100vh;
@@ -222,7 +229,6 @@ const Section1 = styled.div`
   gap: 20px;
 `;
 
-// Section2가 직접 스크롤되도록 설정 (내부에 다수의 Content 컴포넌트가 생성됨)
 const Section2 = styled.div`
   width: 100%;
   flex: 1;
