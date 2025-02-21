@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route"; // NextAuth 설정 불러오기
+import { authOptions } from "../auth/[...nextauth]/route"; // NextAuth 설정 불러오기
 
 export async function GET(req: NextRequest) {
-  // ✅ 로그인된 사용자의 세션 정보 가져오기
+  console.log("📢 API 요청 받음: /api/getBloggerData");
+
+  // ✅ 로그인된 사용자 세션 정보 가져오기
   const session = await getServerSession(authOptions);
 
-  // ✅ 사용자가 로그인하지 않았다면 401 Unauthorized 반환
   if (!session || !session.accessToken) {
+    console.log("❌ 인증 실패: 세션이 없거나 accessToken이 없음");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -19,23 +21,38 @@ export async function GET(req: NextRequest) {
     const blogRes = await fetch(apiUrl, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+
+    if (!blogRes.ok) {
+      console.error("❌ 블로그 ID 가져오기 실패:", blogRes.statusText);
+      return NextResponse.json({ error: "Failed to fetch blog ID" }, { status: blogRes.status });
+    }
+
     const blogData = await blogRes.json();
 
     if (!blogData.items || blogData.items.length === 0) {
       return NextResponse.json({ error: "No blogs found" }, { status: 404 });
     }
 
-    const blogId = blogData.items[0].id; // ✅ 첫 번째 블로그 ID 사용
+    const blogId = blogData.items[0].id;
     const postsUrl = `https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts`;
 
     // ✅ 2단계: 해당 블로그의 게시글 가져오기
     const postsRes = await fetch(postsUrl, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+
+    if (!postsRes.ok) {
+      console.error("❌ 블로그 게시글 가져오기 실패:", postsRes.statusText);
+      return NextResponse.json({ error: "Failed to fetch posts" }, { status: postsRes.status });
+    }
+
     const postsData = await postsRes.json();
+
+    console.log("✅ 블로그 게시글 가져오기 성공:", postsData);
 
     return NextResponse.json(postsData, { status: 200 });
   } catch (error) {
+    console.error("❌ API 요청 중 오류 발생:", error);
     return NextResponse.json({ error: "Failed to fetch posts", details: error }, { status: 500 });
   }
 }

@@ -11,21 +11,40 @@ const WhoAmAIReport: React.FC = () => {
   const router = useRouter();
 
   const [isClient, setIsClient] = useState(false);
-  const [aiResponse, setAiResponse] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [aiResponse, setAiResponse] = useState<string>(""); // AI 응답 상태 추가
+  const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 추가
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // AI 응답 가져오기
+  // ✅ Blogger API → Flask로 전송 → Gemini API 응답 받기
   useEffect(() => {
     async function fetchAIResponse() {
       try {
-        const response = await fetch("http://localhost:5000/generate");
-        const data = await response.json();
-        if (data.response) {
-          setAiResponse(data.response);
+        setLoading(true);
+
+        // ✅ Blogger API에서 데이터를 가져옴
+        const bloggerResponse = await fetch("/api/getBloggerData");
+        const bloggerData = await bloggerResponse.json();
+
+        if (!bloggerData || bloggerData.error) {
+          setAiResponse("Blogger 데이터를 가져오는 데 실패했습니다.");
+          setLoading(false);
+          return;
+        }
+
+        // ✅ Flask 백엔드로 JSON 전송
+        const flaskResponse = await fetch("http://localhost:5000/process_json", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bloggerData),
+        });
+
+        const flaskData = await flaskResponse.json();
+
+        if (flaskData.response) {
+          setAiResponse(flaskData.response);
         } else {
           setAiResponse("응답을 가져오는 데 실패했습니다.");
         }
@@ -35,10 +54,11 @@ const WhoAmAIReport: React.FC = () => {
       }
       setLoading(false);
     }
+
     fetchAIResponse();
   }, []);
 
-  if (!isClient) return null; 
+  if (!isClient) return null;
 
   return (
     <MainContainer>
@@ -47,7 +67,6 @@ const WhoAmAIReport: React.FC = () => {
           src="/report-logo.png"
           width={150}
           height={30}
-          padding-right={20}
           alt="location"
           onClick={() => router.push("/")}
         />
@@ -100,22 +119,6 @@ const Header = styled.header`
   align-items: center;
   padding: 15px 25px;
 `;
-
-/* ✅ 클릭 가능하도록 cursor: pointer 추가 */
-// const HeaderText = styled.button`
-//   font-size: 1.5rem;
-//   font-weight: bold;
-//   color: #333;
-//   background: none;
-//   border: none;
-//   cursor: pointer;
-//   font-family: inherit;
-//   transition: color 0.2s;
-
-//   &:hover {
-//     color: #007bff;
-//   }
-// `;
 
 /* ✅ 홈으로 이동 버튼 스타일 */
 const BackButton = styled.button`
