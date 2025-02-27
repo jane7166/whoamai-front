@@ -82,69 +82,79 @@ const WhoAmAIReport: React.FC = () => {
         />
         <BackButton onClick={() => router.push("/")}>홈으로 돌아가기</BackButton>
       </Header>
-      <ReportPageWrapper>
-        <SummaryWrapper>
-          <Summary>
-            <Section1>
-              <ProfileContainer>
-                <ProfileImage
-                  src={session?.user?.image || "/base-image.svg"}
-                  alt="Profile"
-                />
-                <ProfileDetails>
-                  <Username>{session?.user?.name || "@unknown_user"}</Username>
-                </ProfileDetails>
-              </ProfileContainer>
-              <CenteredContent>
-                <DescriptionTitle>
-                  제가 예측할 수 있는 {session?.user?.name} 님의 정보는 아래와 같아요.
-                </DescriptionTitle>
-              </CenteredContent>
-            </Section1>
-          </Summary>
-          <Section2>
-            {loading ? (
-              <LoadingText>🚀 AI 응답 생성 중...</LoadingText>
-            ) : aiResponses.length > 0 ? (
-              aiResponses.map((response) => (
-                <Content key={response.id}>
-                  <QuestionText>❓ {response.question}</QuestionText>
-                  <AnswerText>💡 {response.answer}</AnswerText>
-                  <EvidenceText>📌 {response.evidence}</EvidenceText>
-                  {response.source_texts.length > 0 && (
-                    <SourceSection>
-                      <h4>📄 참고 텍스트:</h4>
-                      {response.source_texts.map((text, index) => (
-                        <SourceText key={index}>{text}</SourceText>
-                      ))}
-                    </SourceSection>
-                  )}
-                  {response.source_images.length > 0 && (
-                    <SourceSection>
-                      <h4>🖼️ 참고 이미지:</h4>
-                      <ImageGrid>
-                        {response.source_images.map((img, index) => (
-                          <SourceImage key={index} src={img} alt={`출처 이미지 ${index + 1}`} />
+      <RobotContentWrapper>
+        <FixedRobotImage
+          src={loading ? "/whoamai-robot-1.svg" : "/whoamai-robot.svg"}
+          width={500}
+          height={500}
+          alt="로봇 이미지"
+          onClick={() => router.push("/")}
+        />
+        <ReportPageWrapper>
+          <SummaryWrapper>
+            <Summary>
+              <Section1>
+                <ProfileContainer>
+                  <ProfileImage
+                    src={session?.user?.image || "/base-image.svg"}
+                    alt="Profile"
+                  />
+                  <ProfileDetails>
+                    <Username>{session?.user?.name || "@unknown_user"}</Username>
+                  </ProfileDetails>
+                </ProfileContainer>
+                <CenteredContent>
+                  <DescriptionTitle>
+                    제가 예측할 수 있는 {session?.user?.name} 님의 정보는 아래와 같아요.
+                  </DescriptionTitle>
+                </CenteredContent>
+              </Section1>
+            </Summary>
+            <Section2>
+              {loading ? (
+                <LoadingText>🚀 AI 응답 생성 중...</LoadingText>
+              ) : aiResponses.length > 0 ? (
+                aiResponses.map((response) => (
+                  <Content key={response.id}>
+                    <QuestionText>❓ {response.question}</QuestionText>
+                    <AnswerText>💡 {response.answer}</AnswerText>
+                    <EvidenceText>📌 {response.evidence}</EvidenceText>
+                    {response.source_texts.length > 0 && (
+                      <SourceSection>
+                        <h4>📄 참고 텍스트:</h4>
+                        {response.source_texts.map((text, index) => (
+                          <SourceText key={index}>{text}</SourceText>
                         ))}
-                      </ImageGrid>
-                    </SourceSection>
-                  )}
-                </Content>
-              ))
-            ) : (
-              <NoDataText>⚠️ AI 분석 결과가 없습니다.</NoDataText>
-            )}
-          </Section2>
-        </SummaryWrapper>
-      </ReportPageWrapper>
+                      </SourceSection>
+                    )}
+                    {response.source_images.length > 0 && (
+                      <SourceSection>
+                        <h4>🖼️ 참고 이미지:</h4>
+                        <ImageGrid>
+                          {response.source_images.map((img, index) => (
+                            <SourceImage key={index} src={img} alt={`출처 이미지 ${index + 1}`} />
+                          ))}
+                        </ImageGrid>
+                      </SourceSection>
+                    )}
+                  </Content>
+                ))
+              ) : (
+                <NoDataText>⚠️ AI 분석 결과가 없습니다.</NoDataText>
+              )}
+            </Section2>
+          </SummaryWrapper>
+        </ReportPageWrapper>
+      </RobotContentWrapper>
     </MainContainer>
   );
 };
 
 export default WhoAmAIReport;
 
-// ✅ Styled Components 추가 (누락된 스타일 정의)
 const MainContainer = styled.main`
+  background: url('/whoamai-bgimg.png') no-repeat center center fixed;
+  background-size: cover;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -169,16 +179,41 @@ const BackButton = styled.button`
   cursor: pointer;
 `;
 
+const RobotContentWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+// 로봇 이미지를 스크롤 시에도 왼쪽 중앙에 고정되도록 styled-component 추가
+const FixedRobotImage = styled(Image)`
+  position: fixed;
+  left: 20px;           /* 화면 왼쪽으로부터 20px 간격 */
+  top: 50%;             /* 화면 세로 중앙 */
+  transform: translateY(-50%); /* 이미지의 세로 중앙을 기준으로 위치 조정 */
+  z-index: 1000;        /* 다른 요소보다 위에 표시 */
+
+  /* 뷰포트 크기에 비례한 너비 설정 */
+  width: 35vw;
+  height: auto;           /* 높이는 너비에 비례해서 자동 조절 */
+
+  /* 너무 커지거나 작아지지 않도록 제한 추가 */
+  max-width: 500px;
+  min-width: 200px;
+`;
+
 const ReportPageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   width: 100%;
-  gap: 20px;
+  margin-top: 10px;
 `;
 
 const SummaryWrapper = styled.div`
-  width: 80%;
+  width: 70%;
 `;
 
 const Summary = styled.div`
@@ -198,6 +233,8 @@ const Section2 = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 `;
 
 const ProfileContainer = styled.div`
@@ -213,12 +250,15 @@ const ProfileImage = styled.img`
 `;
 
 const ProfileDetails = styled.div`
+  margin-top: 20px;
+  color: #000;
   text-align: center;
 `;
 
 const Username = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
+  margin-bottom: 10px;
 `;
 
 const CenteredContent = styled.div`
@@ -238,6 +278,7 @@ const Content = styled.div`
 `;
 
 const QuestionText = styled.h3`
+  color: #000;
   font-weight: bold;
 `;
 
@@ -248,14 +289,17 @@ const AnswerText = styled.p`
 
 const EvidenceText = styled.p`
   font-size: 1rem;
+  color: #000;
 `;
 
 const SourceSection = styled.div`
+  color: #000;
   margin-top: 10px;
 `;
 
 const SourceText = styled.p`
   font-size: 0.9rem;
+  color: #000;
 `;
 
 const ImageGrid = styled.div`
@@ -271,9 +315,10 @@ const SourceImage = styled.img`
 
 const NoDataText = styled.p`
   font-size: 1rem;
+  color: #000;
 `;
 
 const LoadingText = styled.p`
   font-size: 1rem;
+  color: #000;
 `;
-
