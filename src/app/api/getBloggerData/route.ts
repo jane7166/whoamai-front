@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route"; // NextAuth 설정 불러오기
+import { authOptions } from "../auth/[...nextauth]/route";
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   console.log("📢 API 요청 받음: /api/getBloggerData");
 
-  // ✅ 로그인된 사용자 세션 정보 가져오기
+  // 로그인된 사용자 세션 정보 가져오기
   const session = await getServerSession(authOptions);
 
   if (!session || !session.accessToken) {
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const apiUrl = `https://www.googleapis.com/blogger/v3/users/self/blogs`;
 
   try {
-    // ✅ 1단계: 사용자의 블로그 ID 가져오기
+    // 1단계: 사용자의 블로그 ID 가져오기
     const blogRes = await fetch(apiUrl, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     const blogId = blogData.items[0].id;
     const postsUrl = `https://www.googleapis.com/blogger/v3/blogs/${blogId}/posts`;
 
-    // ✅ 2단계: 해당 블로그의 게시글 가져오기
+    // 2단계: 해당 블로그의 게시글 가져오기
     const postsRes = await fetch(postsUrl, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });

@@ -1,5 +1,8 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
+import { Account } from "next-auth";
 
 export const authOptions = {
   providers: [
@@ -14,14 +17,14 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, token }: { session: any; token: any }) {
-      session.accessToken = token.accessToken as string | undefined;
+    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
+      session.accessToken = token.accessToken;
       session.user.id = token.sub as string;
       return session;
     },
-    async jwt({ token, account }: { token: any; account?: any }) {
+    async jwt({ token, account }: { token: JWT; account?: Account }): Promise<JWT> {
       if (account) {
-        token.accessToken = account.access_token as string;
+        token.accessToken = account.access_token;
       }
       return token;
     },
@@ -30,5 +33,4 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 
-// ✅ App Router에서는 `export { handler as GET, handler as POST }` 방식 사용
 export { handler as GET, handler as POST };
