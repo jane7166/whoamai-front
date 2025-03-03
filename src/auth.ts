@@ -1,8 +1,7 @@
 import "next-auth"; // 글로벌 타입 확장을 불러오기 위해
-import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import type { Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
+import type { Session } from "next-auth";
 
 export const authOptions = {
   providers: [
@@ -30,6 +29,3 @@ export const authOptions = {
     },
   },
 };
-
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };

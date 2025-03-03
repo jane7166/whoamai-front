@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import type { Session } from "next-auth";
-import { authOptions as nextAuthOptions } from "../auth/[...nextauth]/route";
-
-// nextAuthOptions 객체의 타입을 유추하여 사용합니다.
-type MyNextAuthOptions = typeof nextAuthOptions;
-const authOptions: MyNextAuthOptions = nextAuthOptions;
+import { authOptions } from "../../../auth";
 
 export async function GET() {
   console.log("📢 API 요청 받음: /api/getBloggerData");
