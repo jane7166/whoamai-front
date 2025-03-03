@@ -1,13 +1,11 @@
-import "next-auth"; // 글로벌 타입 확장을 불러오기 위해
+import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import type { JWT } from "next-auth/jwt";
-import type { Session } from "next-auth";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       authorization: {
         params: {
           scope: "openid email profile https://www.googleapis.com/auth/blogger",
@@ -16,13 +14,17 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
+    // 세션 콜백
+    async session({ session, token }) {
+      // global.d.ts에서 Session, JWT에 accessToken을 확장한 경우
+      // 아래와 같이 추가 프로퍼티에 접근 가능합니다.
       session.accessToken = token.accessToken;
-      session.user.id = token.sub as string;
+      session.user.id = token.sub ?? "";
       return session;
     },
-    async jwt({ token, account }: { token: JWT; account?: import("next-auth").Account }): Promise<JWT> {
-      if (account && account.access_token) {
+    // JWT 콜백
+    async jwt({ token, account }) {
+      if (account?.access_token) {
         token.accessToken = account.access_token;
       }
       return token;
