@@ -7,12 +7,15 @@ export async function GET() {
   // 로그인된 사용자의 세션 정보 가져오기
   const session: Session | null = await getServerSession(authOptions);
 
-  // 사용자가 로그인하지 않았다면 401 Unauthorized 반환
-  if (!session || !session.accessToken) {
+  // 세션 객체를 확장 타입으로 단언하여 accessToken 프로퍼티에 접근할 수 있도록 합니다.
+  const extendedSession = session as (Session & { accessToken?: string }) | null;
+
+  // 사용자가 로그인하지 않았거나 accessToken이 없으면 401 Unauthorized 반환
+  if (!extendedSession || !extendedSession.accessToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const accessToken = session.accessToken;
+  const accessToken = extendedSession.accessToken;
   const apiUrl = `https://www.googleapis.com/blogger/v3/users/self/blogs`;
 
   try {
