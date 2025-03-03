@@ -25,6 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="google-site-verification" content="C994PQatSCfHsmbYbMeTogKB4QnbaIBkwR3cDBFUoYo" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AuthProvider>{children}</AuthProvider> {/* ✅ 세션 유지 추가 */}
       </body>
