@@ -1,8 +1,9 @@
+import "next-auth";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { Session } from "next-auth";
-import { JWT } from "next-auth/jwt";
-import { Account } from "next-auth";
+import type { Session } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+import type { Account } from "next-auth";
 
 export const authOptions = {
   providers: [
@@ -23,7 +24,7 @@ export const authOptions = {
       return session;
     },
     async jwt({ token, account }: { token: JWT; account?: Account }): Promise<JWT> {
-      if (account) {
+      if (account && account.access_token) {
         token.accessToken = account.access_token;
       }
       return token;
@@ -32,5 +33,4 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };

@@ -1,8 +1,8 @@
+import "next-auth"; // 글로벌 타입 확장을 불러오기 위해
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { Session } from "next-auth";
-import { JWT } from "next-auth/jwt";
-import { Account } from "next-auth";
+import type { Session } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 
 export const authOptions = {
   providers: [
@@ -22,8 +22,8 @@ export const authOptions = {
       session.user.id = token.sub as string;
       return session;
     },
-    async jwt({ token, account }: { token: JWT; account?: Account }): Promise<JWT> {
-      if (account) {
+    async jwt({ token, account }: { token: JWT; account?: import("next-auth").Account }): Promise<JWT> {
+      if (account && account.access_token) {
         token.accessToken = account.access_token;
       }
       return token;

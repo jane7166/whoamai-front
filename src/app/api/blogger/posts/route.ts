@@ -1,10 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import type { Session } from "next-auth";
+import { authOptions as nextAuthOptions } from "../../auth/[...nextauth]/route";
 
-export async function GET(_req: NextRequest) {
+// nextAuthOptions 객체의 타입을 유추하여 사용합니다.
+type MyNextAuthOptions = typeof nextAuthOptions;
+const authOptions: MyNextAuthOptions = nextAuthOptions;
+
+export async function GET() {
   // 로그인된 사용자의 세션 정보 가져오기
-  const session = await getServerSession(authOptions);
+  const session: Session | null = await getServerSession(authOptions);
 
   // 사용자가 로그인하지 않았다면 401 Unauthorized 반환
   if (!session || !session.accessToken) {
@@ -36,6 +41,9 @@ export async function GET(_req: NextRequest) {
 
     return NextResponse.json(postsData, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch posts", details: error }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch posts", details: error },
+      { status: 500 }
+    );
   }
 }

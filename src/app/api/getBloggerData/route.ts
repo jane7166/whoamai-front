@@ -1,12 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import type { Session } from "next-auth";
+import { authOptions as nextAuthOptions } from "../auth/[...nextauth]/route";
 
-export async function GET(_req: NextRequest) {
+// nextAuthOptions 객체의 타입을 유추하여 사용합니다.
+type MyNextAuthOptions = typeof nextAuthOptions;
+const authOptions: MyNextAuthOptions = nextAuthOptions;
+
+export async function GET() {
   console.log("📢 API 요청 받음: /api/getBloggerData");
 
   // 로그인된 사용자 세션 정보 가져오기
-  const session = await getServerSession(authOptions);
+  const session: Session | null = await getServerSession(authOptions);
 
   if (!session || !session.accessToken) {
     console.log("❌ 인증 실패: 세션이 없거나 accessToken이 없음");
