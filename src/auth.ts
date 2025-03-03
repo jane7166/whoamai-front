@@ -1,6 +1,5 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import "global.d.ts";
 
 export const authOptions: NextAuthOptions = {
   providers: [
